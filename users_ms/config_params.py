@@ -10,11 +10,11 @@ class ConfigParams:
     @property
     def db_params(self):
         return {
-            "database": os.getenv("db_name"),
-            "host": os.getenv("db_host"),
-            "user": os.getenv("db_username"),
-            "password": os.getenv("db_password"),
-            "port": os.getenv("db_port"),
+            "database": os.getenv("DB_NAME"),
+            "host": os.getenv("DB_HOST"),
+            "user": os.getenv("DB_USERNAME"),
+            "password": os.getenv("DB_PASSWORD"),
+            "port": os.getenv("DB_PORT"),
         }
 
     @property
