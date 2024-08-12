@@ -19,7 +19,8 @@ ticket_operations = TicketsOperations(db_config=config.db_params)
 def map_operation(operation_name: str) -> Callable:
     try:
         return {
-            "assign_new_user": ticket_operations.update_assignee
+            "assign_new_user": ticket_operations.update_assignee,
+            "update_status": ticket_operations.update_status
         }[operation_name]
     except KeyError:
         print("ERROR: Invalid operation")
