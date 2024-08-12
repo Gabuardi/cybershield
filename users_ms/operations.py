@@ -54,6 +54,7 @@ class UsersOperations:
                 with conn.cursor() as cursor:
                     cursor.execute(sql, (org_data["name"],))
                     conn.commit()
+                print(f"==> New organization {org_data['name']} created successfully")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
