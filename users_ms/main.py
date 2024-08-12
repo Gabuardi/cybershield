@@ -1,3 +1,4 @@
+from json import JSONDecodeError
 from typing import Callable
 import pika
 from config_params import ConfigParams
@@ -30,13 +31,17 @@ def map_operation(operation_name: str) -> Callable:
 
 
 def handle_request(ch, method, properties, body):
-    print("------------------------------------------------------------------")
-    operation_name = properties.headers["operation"]
-    operation = map_operation(operation_name)
-    request_body = json.loads(body)
-    print(f"==> Request received :=> {operation_name}")
-    if operation is not None:
-        operation(request_body)
+    try:
+        print(
+            "------------------------------------------------------------------")
+        operation_name = properties.headers["operation"]
+        operation = map_operation(operation_name)
+        request_body = json.loads(body)
+        print(f"==> Request received :=> {operation_name}")
+        if operation is not None:
+            operation(request_body)
+    except JSONDecodeError:
+        print("ERROR: Invalid JSON")
 
 
 def run_microservice():
