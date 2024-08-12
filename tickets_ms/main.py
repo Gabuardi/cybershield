@@ -1,4 +1,5 @@
 import json
+from json import JSONDecodeError
 from typing import Callable
 
 import pika
@@ -20,21 +21,25 @@ def map_operation(operation_name: str) -> Callable:
     try:
         return {
             "assign_new_user": ticket_operations.update_assignee,
-            "update_status": ticket_operations.update_status
+            "update_status": ticket_operations.update_status,
+            "update_priority": ticket_operations.update_priority,
         }[operation_name]
     except KeyError:
         print("ERROR: Invalid operation")
 
 
 def handle_request(ch, method, properties, body):
-    print("------------------------------------------------------------------")
-    operation_name = properties.headers["operation"]
-    operation = map_operation(operation_name)
-    request_body = json.loads(body)
-    print(f"==> Request received :=> {operation_name}")
-    if operation is not None:
-        operation(request_body)
-
+    try:
+        print(
+            "------------------------------------------------------------------")
+        operation_name = properties.headers["operation"]
+        operation = map_operation(operation_name)
+        request_body = json.loads(body)
+        print(f"==> Request received :=> {operation_name}")
+        if operation is not None:
+            operation(request_body)
+    except JSONDecodeError:
+        print("ERROR: Invalid request body")
 
 def run_microservice():
     print(

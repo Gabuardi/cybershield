@@ -47,3 +47,20 @@ class TicketsOperations:
                     conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+
+    def update_priority(self, data: dict):
+        sql = """UPDATE tickets
+                       SET priority = %s
+                       WHERE ticket_id = %s"""
+
+        try:
+            with psycopg2.connect(**self.db_config) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql, (
+                        data["new_priority"],
+                        data["ticket_id"],))
+                    conn.commit()
+                    print(
+                        f"==> Priority was set to {data['new_priority']} on ticket #{data['ticket_id']}")
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
