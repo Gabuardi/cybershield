@@ -19,6 +19,7 @@ def map_operation(operation_name: str) -> Callable:
         "create_user": user_operations.insert_new_user,
         "update_password": user_operations.update_user_password,
         "create_organization": user_operations.insert_new_org,
+        "add_user_to_organization": user_operations.add_user_to_org,
     }[operation_name]
 
 

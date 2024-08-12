@@ -23,6 +23,7 @@ class UsersOperations:
                         user_data["name"], user_data["last_name"],
                         user_data["email"], user_data["password"]))
                     conn.commit()
+                    print(f"==> New user {user_data['name']} created successfully")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
@@ -54,19 +55,20 @@ class UsersOperations:
                 with conn.cursor() as cursor:
                     cursor.execute(sql, (org_data["name"],))
                     conn.commit()
-                print(f"==> New organization {org_data['name']} created successfully")
+                    print(f"==> New organization {org_data['name']} created successfully")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-    def add_user_to_org(self, user_id: int, org_id: int):
+    def add_user_to_org(self, data: dict):
         sql = """INSERT INTO users_in_organization(user_id, org_id)
                     VALUES(%s, %s)"""
 
         try:
             with psycopg2.connect(**self.db_config) as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(sql, (user_id, org_id))
+                    cursor.execute(sql, (data["user_id"], data["org_id"]))
                     conn.commit()
+                    print(f"==> User #{data['user_id']} added to organization #{data['org_id']} successfully")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
