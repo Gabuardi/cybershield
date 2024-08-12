@@ -72,14 +72,15 @@ class UsersOperations:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-    def remove_user_from_org(self, user_id: int, org_id: int):
+    def remove_user_from_org(self, data: dict):
         sql = """DELETE FROM users_in_organization
                     WHERE user_id = %s AND org_id = %s"""
 
         try:
             with psycopg2.connect(**self.db_config) as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(sql, (user_id, org_id))
+                    cursor.execute(sql, (data["user_id"], data["org_id"]))
                     conn.commit()
+                    print(f"==> User #{data['user_id']} removed from organization #{data['org_id']} successfully")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
