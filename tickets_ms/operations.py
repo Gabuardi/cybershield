@@ -64,3 +64,16 @@ class TicketsOperations:
                         f"==> Priority was set to {data['new_priority']} on ticket #{data['ticket_id']}")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+
+    def add_new_comment(self, data: dict):
+        sql = """INSERT INTO comments (ticket_id, "user", content)
+                VALUES (%s, %s, %s)"""
+
+        try:
+            with psycopg2.connect(**self.db_config) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql, (data["ticket_id"], data["current_user_id"], data["content"]))
+                    conn.commit()
+                    print(f"==> Comment in ticket #{data['ticket_id']} added successfully")
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)

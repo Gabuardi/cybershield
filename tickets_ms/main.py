@@ -23,6 +23,7 @@ def map_operation(operation_name: str) -> Callable:
             "assign_new_user": ticket_operations.update_assignee,
             "update_status": ticket_operations.update_status,
             "update_priority": ticket_operations.update_priority,
+            "comment": ticket_operations.add_new_comment
         }[operation_name]
     except KeyError:
         print("ERROR: Invalid operation")
