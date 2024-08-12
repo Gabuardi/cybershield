@@ -1,3 +1,6 @@
+import json
+from typing import Callable
+
 import pika
 from tickets_ms.config_params import ConfigParams
 from operations import TicketsOperations
@@ -12,13 +15,15 @@ channel = mq_connection.channel()
 channel.queue_declare(queue="tickets_ms.queue")
 ticket_operations = TicketsOperations(db_config=config.db_params)
 
+
 def map_operation(operation_name: str) -> Callable:
     try:
         return {
-
+            "assign_new_user": ticket_operations.update_assignee
         }[operation_name]
     except KeyError:
         print("ERROR: Invalid operation")
+
 
 def handle_request(ch, method, properties, body):
     print("------------------------------------------------------------------")
