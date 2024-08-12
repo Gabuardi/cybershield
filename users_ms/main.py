@@ -16,7 +16,8 @@ user_operations = UsersOperations(config.db_params)
 
 def map_operation(operation_name: str) -> Callable:
     return {
-        "create_user": user_operations.insert_new_user
+        "create_user": user_operations.insert_new_user,
+        "update_password": user_operations.update_user_password
     }[operation_name]
 
 

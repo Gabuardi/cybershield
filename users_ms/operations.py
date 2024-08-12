@@ -26,17 +26,22 @@ class UsersOperations:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-    def update_user_password(self, user_id: int, new_password: str):
+    def update_user_password(self, update_password_data: dict):
         sql = """UPDATE users
                     SET password = %s
                     WHERE user_id = %s"""
-        new_encrypted_password = self.encrypt_password(new_password)
+        new_encrypted_password = self.encrypt_password(
+            update_password_data["new_password"])
 
         try:
             with psycopg2.connect(**self.db_config) as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(sql, (new_encrypted_password, user_id))
+                    cursor.execute(sql, (
+                        new_encrypted_password,
+                        update_password_data["user_id"]))
                     conn.commit()
+                    print(
+                        f"==> Password of user #{update_password_data['user_id']} updated successfully")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
