@@ -4,26 +4,23 @@ from typing import Callable
 
 import pika
 from tickets_ms.config_params import ConfigParams
-from operations import TicketsOperations
+from operations import ReportsOperations
 
 config = ConfigParams()
 mq_params = config.mq_params
+QUEUE_NAME = "reports_ms.queue"
 credentials = pika.PlainCredentials(mq_params["username"],
                                     mq_params["password"])
 mq_connection = pika.BlockingConnection(
     pika.ConnectionParameters(host=mq_params["host"], credentials=credentials))
 channel = mq_connection.channel()
-channel.queue_declare(queue="tickets_ms.queue")
-ticket_operations = TicketsOperations(db_config=config.db_params)
+channel.queue_declare(queue=QUEUE_NAME)
+report_operations = ReportsOperations(db_config=config.db_params)
 
 
 def map_operation(operation_name: str) -> Callable:
     try:
         return {
-            "assign_new_user": ticket_operations.update_assignee,
-            "update_status": ticket_operations.update_status,
-            "update_priority": ticket_operations.update_priority,
-            "comment": ticket_operations.add_new_comment
         }[operation_name]
     except KeyError:
         print("ERROR: Invalid operation")
@@ -45,7 +42,7 @@ def handle_request(ch, method, properties, body):
 def run_microservice():
     print(
         '==> Listening message queue, waiting for logs. To exit press CTRL+C')
-    channel.basic_consume(queue="tickets_ms.queue",
+    channel.basic_consume(queue=QUEUE_NAME,
                           on_message_callback=handle_request,
                           auto_ack=True)
     channel.start_consuming()

@@ -1,7 +1,7 @@
 import psycopg2
 
 
-class TicketsOperations:
+class ReportsOperations:
 
     def __init__(self, db_config: dict):
         self.db_config = db_config
