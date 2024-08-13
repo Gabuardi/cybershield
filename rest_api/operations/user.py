@@ -61,9 +61,6 @@ class UserOperations:
                     row = cursor.fetchone()
                     if row is not None:
                         result = row[0]
-                        id = result["user_id"]
-                        result["orgs"] = UserOperations(
-                            self.db_config).get_user_orgs(id)
                     conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             return error

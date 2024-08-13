@@ -2,7 +2,8 @@ from fastapi import FastAPI, Request, HTTPException
 from rest_api.config_params import ConfigParams, MQService
 from rest_api.operations import (
     UserOperations,
-    TicketOperations
+    TicketOperations,
+    AssetOperation
 )
 
 from rest_api.adapters.user_adapters import get_auth_header
@@ -13,6 +14,7 @@ db_config = ConfigParams().db_params
 mq_service = MQService(ConfigParams().mq_params)
 user_ops = UserOperations(db_config)
 ticket_ops = TicketOperations(db_config, mq_service)
+asset_ops = AssetOperation(db_config)
 
 
 # ----------------------------------------------------------------------------
@@ -58,4 +60,13 @@ def report_new_vulnerability(body: dict, request: Request):
 # ----------------------------------------------------------------------------
 # TICKET
 # ----------------------------------------------------------------------------
-@app.get("/report/all", tags=["Vulnerability Report"])
+@app.get("/tickets/all", tags=["Ticket"])
+def report_all_vulnerabilities(request: Request):
+    credentials = get_auth_header(request)
+    if user_ops.authenticate(**credentials):
+        user_id = user_ops.get_user_data(credentials["email"])["user_id"]
+        org_tuple = tuple(user_ops.get_user_orgs(user_id))
+        return asset_ops.get_assets_by_org(org_tuple)
+    else:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
