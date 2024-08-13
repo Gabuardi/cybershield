@@ -53,3 +53,9 @@ def report_new_vulnerability(body: dict, request: Request):
         ticket_ops.create_new_ticket(body)
     else:
         raise HTTPException(status_code=401, detail="Unauthorized")
+
+
+# ----------------------------------------------------------------------------
+# TICKET
+# ----------------------------------------------------------------------------
+@app.get("/report/all", tags=["Vulnerability Report"])

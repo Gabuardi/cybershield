@@ -25,3 +25,4 @@ class TicketOperations:
             "create_new_report",
             mq_body
         )
+
