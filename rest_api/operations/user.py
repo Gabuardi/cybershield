@@ -1,6 +1,8 @@
-import hashlib
 from typing import List
-
+from rest_api.adapters.user_adapters import (
+    encrypt_password,
+    user_in_org_adapter
+)
 import psycopg2
 
 
@@ -8,10 +10,6 @@ class UserOperations:
 
     def __init__(self, db_config: dict):
         self.db_config = db_config
-
-    @staticmethod
-    def encrypt_password(password: str) -> str:
-        return hashlib.sha256(password.encode()).hexdigest()
 
     def authenticate(self, email: str, password: str) -> bool:
         sql = """SELECT password
@@ -24,20 +22,13 @@ class UserOperations:
                 with conn.cursor() as cursor:
                     cursor.execute(sql, (email,))
                     row = cursor.fetchone()
-                    if row and row[0] == self.encrypt_password(password):
+                    if row and row[0] == encrypt_password(password):
                         result = True
                     conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             return error
         finally:
             return result
-
-    def user_in_org_adapter(self, data: list) -> list[int]:
-        result = []
-        for row in data:
-            for nested in row:
-                result.append(nested["org_id"])
-        return result
 
     def get_user_orgs(self, user_id: int) -> List[int]:
         sql = """SELECT row_to_json(s.*)
@@ -56,7 +47,7 @@ class UserOperations:
         except (Exception, psycopg2.DatabaseError) as error:
             return error
         finally:
-            return self.user_in_org_adapter(result)
+            return user_in_org_adapter(result)
 
     def get_user_data(self, email: str) -> dict:
         sql = """SELECT to_json(s.*)
