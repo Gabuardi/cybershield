@@ -27,6 +27,7 @@ class ConfigParams:
             "password": os.getenv("MQ_PASSWORD"),
         }
 
+
 class MQService:
 
     def __init__(self, mq_params: dict):
@@ -35,7 +36,7 @@ class MQService:
             mq_params["password"]
         )
         self.connection_params = pika.ConnectionParameters(
-            host='localhost',
+            host=mq_params["host"],
             credentials=credentials
         )
 
@@ -51,6 +52,7 @@ class MQService:
         connection = pika.BlockingConnection(self.connection_params)
         channel = connection.channel()
         channel.basic_publish(
+            exchange="",
             routing_key=queue,
             body=json.dumps(body),
             properties=self.set_operation_header(operation)

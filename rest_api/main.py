@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException
-from rest_api.config_params import ConfigParams
+from rest_api.config_params import ConfigParams, MQService
 from rest_api.operations.user import UserOperations
 
 from rest_api.adapters.user_adapters import get_auth_header
@@ -7,6 +7,7 @@ from rest_api.adapters.user_adapters import get_auth_header
 app = FastAPI()
 db_config = ConfigParams().db_params
 
+mq_service = MQService(ConfigParams().mq_params)
 user_ops = UserOperations(db_config)
 
 
@@ -23,5 +24,16 @@ def get_user_data(request: Request):
 
 @app.put('/password-update/{user_id}', tags=["User Management"])
 def update_user_password(user_id: int, body: dict, request: Request):
-    print(user_id)
-    print(body)
+    credentials = get_auth_header(request)
+    if user_ops.authenticate(**credentials):
+        mq_body = {
+            "user_id": user_id,
+            "new_password": body["new_password"]
+        }
+        mq_service.send_mq_message(
+            "users_ms.queue",
+            "update_password",
+            mq_body
+        )
+    else:
+        raise HTTPException(status_code=401, detail="Unauthorized")
