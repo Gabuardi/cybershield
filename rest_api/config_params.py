@@ -1,4 +1,6 @@
 import os
+import json
+import pika
 from dotenv import load_dotenv
 
 
@@ -24,3 +26,33 @@ class ConfigParams:
             "username": os.getenv("MQ_USERNAME"),
             "password": os.getenv("MQ_PASSWORD"),
         }
+
+class MQService:
+
+    def __init__(self, mq_params: dict):
+        credentials = pika.PlainCredentials(
+            mq_params["username"],
+            mq_params["password"]
+        )
+        self.connection_params = pika.ConnectionParameters(
+            host='localhost',
+            credentials=credentials
+        )
+
+    @staticmethod
+    def set_operation_header(operation: str) -> pika.BasicProperties:
+        return pika.BasicProperties(
+            headers={
+                "operation": operation
+            }
+        )
+
+    def send_mq_message(self, queue: str, operation: str, body: dict):
+        connection = pika.BlockingConnection(self.connection_params)
+        channel = connection.channel()
+        channel.basic_publish(
+            routing_key=queue,
+            body=json.dumps(body),
+            properties=self.set_operation_header(operation)
+        )
+        connection.close()
