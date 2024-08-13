@@ -7,6 +7,7 @@ from rest_api.operations import (
 )
 
 from rest_api.adapters.user_adapters import get_auth_header
+from rest_api.adapters.ticket_adapter import attach_asset_info
 
 app = FastAPI()
 db_config = ConfigParams().db_params
@@ -66,7 +67,10 @@ def report_all_vulnerabilities(request: Request):
     if user_ops.authenticate(**credentials):
         user_id = user_ops.get_user_data(credentials["email"])["user_id"]
         org_tuple = tuple(user_ops.get_user_orgs(user_id))
-        return asset_ops.get_assets_by_org(org_tuple)
+        assets_by_org = asset_ops.get_assets_by_org(org_tuple)
+        for org in assets_by_org:
+            org["tickets"] = ticket_ops.get_ticket_list_by_asset(tuple(org["asset_id_list"]))
+        return attach_asset_info(assets_by_org)
     else:
         raise HTTPException(status_code=401, detail="Unauthorized")
 

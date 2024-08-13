@@ -1,5 +1,7 @@
+import psycopg2
+from rest_api.adapters.ticket_adapter import tickets_adapter
 from rest_api.config_params import MQService
-
+from typing import Tuple
 
 class TicketOperations:
 
@@ -25,4 +27,22 @@ class TicketOperations:
             "create_new_report",
             mq_body
         )
+
+    def get_ticket_list_by_asset(self, asset_id_list: Tuple):
+        sql = """SELECT to_json(s.*)
+                    FROM tickets AS s
+                    WHERE asset IN %s"""
+        result = []
+        try:
+            with psycopg2.connect(**self.db_config) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql, (asset_id_list,))
+                    rows = cursor.fetchall()
+                    if rows:
+                        result = rows
+                    conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            return error
+        finally:
+            return tickets_adapter(result)
 
