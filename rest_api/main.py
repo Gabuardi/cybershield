@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Request, HTTPException
 from rest_api.config_params import ConfigParams, MQService
-from rest_api.operations.user import UserOperations
+from rest_api.operations import (
+    UserOperations,
+    TicketOperations
+)
 
 from rest_api.adapters.user_adapters import get_auth_header
 
@@ -9,6 +12,7 @@ db_config = ConfigParams().db_params
 
 mq_service = MQService(ConfigParams().mq_params)
 user_ops = UserOperations(db_config)
+ticket_ops = TicketOperations(db_config, mq_service)
 
 
 # ----------------------------------------------------------------------------
@@ -42,10 +46,10 @@ def update_user_password(user_id: int, body: dict, request: Request):
 # ----------------------------------------------------------------------------
 # VULNERABILITY REPORT
 # ----------------------------------------------------------------------------
-@app.post("/report/vulnerability}", tags=["Vulnerability Report"])
+@app.post("/report/vulnerability", tags=["Vulnerability Report"])
 def report_new_vulnerability(body: dict, request: Request):
     credentials = get_auth_header(request)
     if user_ops.authenticate(**credentials):
-        pass
+        ticket_ops.create_new_ticket(body)
     else:
         raise HTTPException(status_code=401, detail="Unauthorized")

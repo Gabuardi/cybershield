@@ -42,6 +42,7 @@ def handle_request(ch, method, properties, body):
     except JSONDecodeError:
         print("ERROR: Invalid request body")
 
+
 def run_microservice():
     print(
         '==> Listening message queue, waiting for logs. To exit press CTRL+C')
