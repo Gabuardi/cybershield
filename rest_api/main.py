@@ -37,3 +37,15 @@ def update_user_password(user_id: int, body: dict, request: Request):
         )
     else:
         raise HTTPException(status_code=401, detail="Unauthorized")
+
+
+# ----------------------------------------------------------------------------
+# VULNERABILITY REPORT
+# ----------------------------------------------------------------------------
+@app.post("/report/vulnerability}", tags=["Vulnerability Report"])
+def report_new_vulnerability(body: dict, request: Request):
+    credentials = get_auth_header(request)
+    if user_ops.authenticate(**credentials):
+        pass
+    else:
+        raise HTTPException(status_code=401, detail="Unauthorized")
