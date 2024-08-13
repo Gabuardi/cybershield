@@ -78,7 +78,8 @@ class ReportsOperations:
         asset_id = self.get_asset_id(data["asset_info"])
         if asset_id is not None:
             sql = """INSERT INTO tickets (asset, status, summary, description, solution, priority)
-                           VALUES (%s, %s, %s, %s, %s, %s)"""
+                           VALUES (%s, %s, %s, %s, %s, %s)
+                           RETURNING ticket_id"""
             try:
                 with psycopg2.connect(**self.db_config) as conn:
                     with conn.cursor() as cursor:
