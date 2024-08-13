@@ -21,6 +21,7 @@ report_operations = ReportsOperations(db_config=config.db_params)
 def map_operation(operation_name: str) -> Callable:
     try:
         return {
+            'create_new_report': report_operations.new_report
         }[operation_name]
     except KeyError:
         print("ERROR: Invalid operation")
@@ -41,19 +42,12 @@ def handle_request(ch, method, properties, body):
 
 
 def run_microservice():
-    # print(
-    #     '==> Listening message queue, waiting for logs. To exit press CTRL+C')
-    # channel.basic_consume(queue=QUEUE_NAME,
-    #                       on_message_callback=handle_request,
-    #                       auto_ack=True)
-    # channel.start_consuming()
-    data = {
-        "owner_org": 3,
-        "ip": "127.0.2.1",
-        "dns": "test.cr.2",
-        "os": "linux"
-    }
-    print(report_operations.org_lookup('team_bab2y'))
+    print(
+        '==> Listening message queue, waiting for logs. To exit press CTRL+C')
+    channel.basic_consume(queue=QUEUE_NAME,
+                          on_message_callback=handle_request,
+                          auto_ack=True)
+    channel.start_consuming()
 
 
 run_microservice()
