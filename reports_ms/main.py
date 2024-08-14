@@ -3,7 +3,7 @@ from json import JSONDecodeError
 from typing import Callable
 
 import pika
-from tickets_ms.config_params import ConfigParams
+from reports_ms.config_params import ConfigParams
 from operations import ReportsOperations
 
 config = ConfigParams()
