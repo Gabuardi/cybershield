@@ -57,7 +57,7 @@ class UserOperations:
         try:
             with psycopg2.connect(**self.db_config) as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(sql, ("cr7@futbol.com",))
+                    cursor.execute(sql, (email,))
                     row = cursor.fetchone()
                     if row is not None:
                         result = row[0]

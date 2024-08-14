@@ -45,6 +45,8 @@ class TicketsOperations:
                         data["new_status_id"],
                         data["current_user_id"]))
                     conn.commit()
+                    print(
+                        f"==> New ticket log: ticket #{data['ticket_id']} status is now {data['new_status_id']}")
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 

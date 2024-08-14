@@ -3,6 +3,7 @@ from rest_api.adapters.ticket_adapter import tickets_adapter
 from rest_api.config_params import MQService
 from typing import Tuple
 
+
 class TicketOperations:
 
     def __init__(self, db_config: dict, mq_service: MQService):
@@ -46,3 +47,25 @@ class TicketOperations:
         finally:
             return tickets_adapter(result)
 
+    def assign_new_user(self, ticket_id: int, user_id: int):
+        mq_body = {
+            "user_id": user_id,
+            "ticket_id": ticket_id
+        }
+        self.mq.send_mq_message(
+            "tickets_ms.queue",
+            "assign_new_user",
+            mq_body
+        )
+
+    def set_new_status(self, ticket_id: int, data: dict):
+        mq_body = {
+            "new_status_id": data["new_status_id"],
+            "ticket_id": ticket_id,
+            "current_user_id": data["current_user_id"]
+        }
+        self.mq.send_mq_message(
+            "tickets_ms.queue",
+            "update_status",
+            mq_body
+        )

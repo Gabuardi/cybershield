@@ -74,3 +74,22 @@ def report_all_vulnerabilities(request: Request):
     else:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
+
+@app.put("/tickets/{ticket_id}/update/assignee", tags=["Ticket"])
+def assign_new_user(ticket_id: int, body: dict, request: Request):
+    credentials = get_auth_header(request)
+    if user_ops.authenticate(**credentials):
+        ticket_ops.assign_new_user(ticket_id, body["new_user_id"])
+    else:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+
+@app.put("/tickets/{ticket_id}/update/status", tags=["Ticket"])
+def assign_new_user(ticket_id: int, body: dict, request: Request):
+    credentials = get_auth_header(request)
+    if user_ops.authenticate(**credentials):
+        ticket_ops.set_new_status(ticket_id, body)
+    else:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+
